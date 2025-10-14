@@ -22,7 +22,8 @@ namespace ProducInventory
                    $"Nom du produit : {Nom}\n" +
                    $"Prix du produit : {Prix}\n" +
                    $"Quantité du produit : {Quantite}\n" +
-                   $"Catégorie du produit : {Categorie}";
+                   $"Catégorie du produit : {Categorie}" +
+                   "\n";
         }
         
         public double ValeurStock()
