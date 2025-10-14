@@ -1,7 +1,7 @@
 ﻿namespace ProducInventory {
     class Program {
         static GestionaireProduits StockProduits = new();
-        const string cheminFichier = "Inventaire.txt";
+        const string cheminFichier = "inventaire.txt";
 
         static int GetValidInt()
         {
@@ -26,7 +26,7 @@
         static string GetValidString(bool allowNumbers = false)
         {
             string input = Console.ReadLine() ?? "";
-            while (string.IsNullOrWhiteSpace(input) || !allowNumbers && input.All(char.IsDigit))
+            while (string.IsNullOrWhiteSpace(input) || !allowNumbers && input.Any(char.IsDigit))
             {
                 Console.WriteLine(" Veuillez rentrer une chaîne de caractères valide");
                 input = Console.ReadLine() ?? "";
@@ -68,49 +68,104 @@
 
         static void ModifierProduit()
         {
-            Console.WriteLine("Entrez le nom du produit:");
-            string nom = GetValidString();
-            Console.WriteLine("Entrez la référence du produit:");
+            Console.WriteLine("Entrez la référence du produit que vous voulez modifier:");
             string reference = GetValidString(true);
-            while (StockProduits.RechercherProduit(reference) == null)
-            {
-                Console.WriteLine(" Ce produit n'existe pas, veuillez rentrer une réference valide");
-                reference = GetValidString();
-            }
-            Console.WriteLine("Entrez le prix du produit:");
-            double prix = GetValidDouble();
-            while (prix <= 0)
-            {
-                Console.WriteLine(" Veuillez rentrer un prix supérieur à 0");
-                prix = GetValidDouble();
-            }
-            Console.WriteLine("Entrez la quantité du produit:");
-            int quantite = GetValidInt();
-            while (quantite < 0)
-            {
-                Console.WriteLine(" Veuillez rentrer un prix supérieur ou égale à 0");
-                prix = GetValidDouble();
-            }
-            Console.WriteLine("Entrez la catégorie du produit:");
-            string categorie = GetValidString();
 
-            Produit produit = new(nom, prix, quantite, categorie);
+            Produit? produitExistant = StockProduits.RechercherProduit(reference);
+            while (produitExistant == null)
+            {
+                Console.WriteLine("Ce produit n'existe pas, veuillez rentrer une référence valide :");
+                reference = GetValidString(true);
+                produitExistant = StockProduits.RechercherProduit(reference);
+            }
 
-            StockProduits.ModifierProduit(reference, produit);
+            string nom = produitExistant.Nom;
+            double prix = produitExistant.Prix;
+            int quantite = produitExistant.Quantite;
+            string categorie = produitExistant.Categorie;
 
+            int choixModification;
+            do
+            {
+                AfficherMenuModification();
+                choixModification = GetValidInt();
+
+                switch (choixModification)
+                {
+                    case 1:
+                        Console.WriteLine("Entrez le nouveau nom du produit:");
+                        nom = GetValidString();
+                        break;
+
+                    case 2:
+                        Console.WriteLine("Entrez le nouveau prix du produit:");
+                        prix = GetValidDouble();
+                        while (prix <= 0)
+                        {
+                            Console.WriteLine("Veuillez rentrer un prix supérieur à 0 :");
+                            prix = GetValidDouble();
+                        }
+                        break;
+
+                    case 3:
+                        Console.WriteLine("Entrez la nouvelle quantité du produit:");
+                        quantite = GetValidInt();
+                        while (quantite < 0)
+                        {
+                            Console.WriteLine("Veuillez rentrer une quantité supérieure ou égale à 0 :");
+                            quantite = GetValidInt();
+                        }
+                        break;
+
+                    case 4:
+                        Console.WriteLine("Entrez la nouvelle catégorie du produit:");
+                        categorie = GetValidString();
+                        break;
+
+                    case 5:
+                        Console.WriteLine("Modifications enregistrées.");
+                        break;
+
+                    default:
+                        Console.WriteLine("Choix invalide, veuillez réessayer.");
+                        break;
+                }
+
+            } while (choixModification != 5);
+
+            Produit produitModifie = new Produit(nom, prix, quantite, categorie);
+            StockProduits.ModifierProduit(reference, produitModifie);
+
+            Console.WriteLine("Produit modifié avec succès !");
         }
+
+        static void AfficherMenuModification()
+        {
+            Console.WriteLine(@"
+Que voulez-vous modifier ?
+1. Nom
+2. Prix
+3. Quantité
+4. Catégorie
+5. Valider les modifications
+Votre choix :");
+        }
+
 
         static void SupprimerProduit()
         {
             Console.WriteLine("Entrez la référence du produit:");
-            string reference = GetValidString();
+            string reference = GetValidString(true);
 
             Console.WriteLine("Etes vous sur de vouloir supprimer ce produit?");
             Console.WriteLine("Entrez 1 pour 'OUI' et un autre caratere quelconque pour 'NON'?");
             string confirmation = Console.ReadLine() ?? "";
             if (int.Parse(confirmation) == 1)
             {
-                StockProduits.SupprimerProduit(reference);
+                if (StockProduits.SupprimerProduit(reference))
+                    Console.WriteLine("Produit supprimé avec succès !");
+                else
+                    Console.WriteLine("Ce produit n'existe pas");
             }
 
         }
@@ -120,7 +175,7 @@
             if (StockProduits.EstAJour(cheminFichier)) return;
             if (confirmationNeeded)
             {
-                Console.WriteLine("\nVoulez-vous sauvegarder les changements?");
+                Console.WriteLine("\nVoulez-vous sauvegarder les changements sur le fichier ?");
                 Console.WriteLine("Entrez 1 pour 'OUI' et un autre caratere quelconque pour 'NON'?");
                 int confirmationChoice ;
                 if (int.TryParse(Console.ReadLine(), out confirmationChoice ) && confirmationChoice == 1)
@@ -138,13 +193,14 @@
 
         static void RechercherProduit()
         {
-            string reference = GetValidString();
+            Console.WriteLine("Entrez la référence de votre produit: ");
+            string reference = GetValidString(true);
             var produit = StockProduits.RechercherProduit(reference);
 
             if (produit != null)
             {
                 Console.WriteLine("\nVoici le produit recherché:\n");
-                produit.ToString();
+                Console.WriteLine(produit.ToString());
             }
             else
             {
