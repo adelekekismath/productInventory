@@ -2,4 +2,6 @@ Chaise|CH123|49.99|20|Mobilier
 Table|TB456|129.99|10|Mobilier
 Lampe|LP789|19.99|35|Éclairage
 Ordinateur|PC321|599.99|5|Électronique
-Stylo|ST654|0.99|100|Papeterie
+Stylo|ST654|0.99|100|PapeterieChaise
+ananas|A55|5|90|Fruit
+orange|O852|8|83|Fruit
