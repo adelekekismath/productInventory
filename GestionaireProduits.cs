@@ -6,7 +6,7 @@ namespace ProducInventory
 
         private bool EstVide(bool showMessage = true)
         {
-            if(showMessage &&!(Produits.Count > 0)) Console.WriteLine("La liste de produit est vide");
+            if (showMessage && !(Produits.Count > 0)) Console.WriteLine("La liste de produit est vide");
             return !(Produits.Count > 0);
         }
 
@@ -17,11 +17,15 @@ namespace ProducInventory
                 Produits.Add(produit);
                 return;
             }
-            
-            if (RechercherProduit(produit.Reference) == null)
+
+            if (produit.Reference != null && RechercherProduit(produit.Reference) == null)
             {
                 Produits.Add(produit);
-                Console.WriteLine($"Le produit {produit.Nom} a été ajouté avec succes");
+                Console.WriteLine($"\nLe produit {produit.Nom} a été ajouté avec succes");
+            }
+            else if (produit.Reference == null)
+            {
+                Console.WriteLine("Impossible d'ajouter ce produit, la référence est nulle");
             }
             else
             {
@@ -90,6 +94,8 @@ namespace ProducInventory
         {
             if (EstVide()) return;
 
+            Console.WriteLine("\nStatistiques de l'inventaire:\n");
+
             Console.WriteLine($"Le nombre total de produit est {Produits.Count}");
 
             double valeurTotalInventaire = 0;
@@ -135,19 +141,21 @@ namespace ProducInventory
             }
 
         }
-        
+
         public void SauvegarderProduits(string cheminFichier)
         {
             if (EstVide()) return;
             try
             {
-                using StreamWriter ecrivain = new StreamWriter(cheminFichier, true);
-                
+                using StreamWriter ecrivain = new StreamWriter(cheminFichier, false);
+
                 foreach (var produit in Produits)
                 {
                     ecrivain.WriteLine($"{produit.Nom}|{produit.Reference}|{produit.Prix}|{produit.Quantite}|{produit.Categorie}");
                 }
-                
+
+                Console.WriteLine("La sauvegarde a été éffectuée avec succès.");
+
             }
             catch (FileNotFoundException)
             {
@@ -164,6 +172,38 @@ namespace ProducInventory
             }
         }
 
+    
+    
+        public bool EstAJour(string cheminFichier)
+        {
+            List<Produit> sauvegardeActuelle = [];
+            try
+            {
+                string[] lignes = File.ReadAllLines(cheminFichier);
+
+                foreach (var ligne in lignes)
+                {
+                    var listeProprietes = ligne.Split("|");
+                    Produit produit = new(listeProprietes[0], listeProprietes[1], double.Parse(listeProprietes[2]), int.Parse(listeProprietes[3]), listeProprietes[4]);
+                    sauvegardeActuelle.Add(produit);
+                }
+            }
+            catch (FileNotFoundException)
+            {
+                Console.WriteLine("Erreur: Le fichier n'a pas été trouvé.");
+            }
+            catch (IOException ioEx)
+            {
+                Console.WriteLine($"Erreur d'entrée/sortie: {ioEx.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erreur: {ex.Message}");
+            }
+
+
+            return Produits.SequenceEqual(sauvegardeActuelle);
+        } 
     }
     
     
