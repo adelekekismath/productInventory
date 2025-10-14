@@ -1,0 +1,12 @@
+# Dossiers de compilation et de sortie
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+# Fichiers auto-générés pour le runtime
+*.pdb
+*.suo
+*.user
+*.bak
+*.ncb
+*.aps
