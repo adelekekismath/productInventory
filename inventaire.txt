@@ -1,10 +1,2 @@
-Chaise|CH123|49.99|20|Mobilier
-Table|TB456|129.99|10|Mobilier
-Lampe|LP789|19.99|35|Éclairage
-Ordinateur|PC321|599.99|5|Électronique
-Stylo|ST654|0.99|100|PapeterieChaise
-KIW|A55|99.6|55|-
-orange|O852|8|83|Fruit
-kiwi|55A|55.32|7|  poisson  -
-hgjkl|566h|85|12|lkjhgf
-&&&|&&&|111|111|é"
+bouteille eau|LKOEDK|0.25|12|alimentation
+bouteille eau|KIEJIES|0.32|58|boisson

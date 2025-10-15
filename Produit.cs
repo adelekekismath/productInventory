@@ -1,11 +1,11 @@
 namespace ProducInventory
 {
     class Produit {
-        public string Nom { get; set; }
-        public string? Reference { get; set; }
-        public double Prix { get; set; }
-        public int Quantite { get; set; }
-        public string Categorie { get; set; }
+        private string Nom { get; set; }
+        private string? Reference { get; set; }
+        private double Prix { get; set; }
+        private int Quantite { get; set; }
+        private string Categorie { get; set; }
 
         public Produit(string nom, string reference, double prix, int quantite, string categorie)
         {
