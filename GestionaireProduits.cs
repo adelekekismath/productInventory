@@ -114,13 +114,22 @@ namespace ProducInventory
             }
         }
 
+        private bool isFileExist(string cheminFichier)
+        {
+            if (!File.Exists(cheminFichier))
+            {
+                Console.WriteLine("Le fichier spécifié n'existe pas.");
+                return false;
+            }
+            return true;
+        }
+
         public void ChargerProduits(string cheminFichier)
         {
             try
             {
-                string[] lignes = File.ReadAllLines(cheminFichier);
 
-                foreach (var ligne in lignes)
+                foreach (var ligne in File.ReadAllLines(cheminFichier))
                 {
                     var listeProprietes = ligne.Split("|");
                     Produit produit = new(listeProprietes[0], listeProprietes[1], double.Parse(listeProprietes[2]), int.Parse(listeProprietes[3]), listeProprietes[4]);
@@ -171,39 +180,42 @@ namespace ProducInventory
                 Console.WriteLine($"Erreur: {ex.Message}");
             }
         }
-
     
     
         public bool EstAJour(string cheminFichier)
         {
-            List<Produit> sauvegardeActuelle = [];
+            if (!isFileExist(cheminFichier)) return false;
+
+            List<Produit> produitsFichier = [];
+
             try
             {
-                string[] lignes = File.ReadAllLines(cheminFichier);
-
-                foreach (var ligne in lignes)
+                foreach (var ligne in File.ReadAllLines(cheminFichier))
                 {
-                    var listeProprietes = ligne.Split("|");
-                    Produit produit = new(listeProprietes[0], listeProprietes[1], double.Parse(listeProprietes[2]), int.Parse(listeProprietes[3]), listeProprietes[4]);
-                    sauvegardeActuelle.Add(produit);
+                    var champs = ligne.Split('|');
+                    if (champs.Length >= 5)
+                    {
+                        produitsFichier.Add(new Produit(
+                            champs[0],
+                            champs[1],
+                            double.Parse(champs[2]),
+                            int.Parse(champs[3]),
+                            champs[4]
+                        ));
+                    }
                 }
-            }
-            catch (FileNotFoundException)
-            {
-                Console.WriteLine("Erreur: Le fichier n'a pas été trouvé.");
-            }
-            catch (IOException ioEx)
-            {
-                Console.WriteLine($"Erreur d'entrée/sortie: {ioEx.Message}");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Erreur: {ex.Message}");
+                Console.WriteLine($"Erreur lors du chargement du fichier : {ex.Message}");
+                return false;
             }
 
+            if (Produits.Count != produitsFichier.Count) return false;
 
-            return Produits.SequenceEqual(sauvegardeActuelle);
-        } 
+            return Produits.OrderBy(p => p.Reference).SequenceEqual(produitsFichier.OrderBy(p => p.Reference));
+
+        }
     }
     
     
