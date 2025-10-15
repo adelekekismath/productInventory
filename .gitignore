@@ -10,3 +10,5 @@
 *.bak
 *.ncb
 *.aps
+
+obj/*
