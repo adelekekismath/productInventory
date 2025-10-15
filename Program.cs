@@ -1,6 +1,6 @@
 ﻿namespace ProducInventory {
     class Program {
-        static GestionaireProduits StockProduits = new();
+        static readonly GestionaireProduits StockProduits = new(new FichierTexteStockage());
         const string cheminFichier = "inventaire.txt";
 
         static int GetValidInt()
@@ -64,6 +64,7 @@
 
             Produit produit = new(nom, reference, prix, quantite, categorie);
             StockProduits.AjouterProduit(produit);
+            Sauvegarder();
         }
 
         static void ModifierProduit()
@@ -137,6 +138,7 @@
             StockProduits.ModifierProduit(reference, produitModifie);
 
             Console.WriteLine("Produit modifié avec succès !");
+            Sauvegarder();
         }
 
         static void AfficherMenuModification()
@@ -157,6 +159,12 @@ Votre choix :");
             Console.WriteLine("Entrez la référence du produit:");
             string reference = GetValidString(true);
 
+            if(StockProduits.RechercherProduit(reference) == null)
+            {
+                Console.WriteLine("Ce produit n'existe pas.");
+                return;
+            }
+
             Console.WriteLine("Etes vous sur de vouloir supprimer ce produit?");
             Console.WriteLine("Entrez 1 pour 'OUI' et un autre caratere quelconque pour 'NON'?");
             string confirmation = Console.ReadLine() ?? "";
@@ -168,17 +176,23 @@ Votre choix :");
                     Console.WriteLine("Ce produit n'existe pas");
             }
 
+            Sauvegarder();
+
         }
         
         static void Sauvegarder(bool confirmationNeeded = true)
         {
-            if (StockProduits.EstAJour(cheminFichier)) return;
+            if (StockProduits.EstAJour(cheminFichier))
+            {
+                Console.WriteLine("L'inventaire est déjà à jour. Aucune sauvegarde nécessaire.");
+                return;
+            }
             if (confirmationNeeded)
             {
                 Console.WriteLine("\nVoulez-vous sauvegarder les changements sur le fichier ?");
                 Console.WriteLine("Entrez 1 pour 'OUI' et un autre caratere quelconque pour 'NON'?");
-                int confirmationChoice ;
-                if (int.TryParse(Console.ReadLine(), out confirmationChoice ) && confirmationChoice == 1)
+
+                if (int.TryParse(Console.ReadLine(), out int confirmationChoice) && confirmationChoice == 1)
                 {
                     StockProduits.SauvegarderProduits(cheminFichier);
                 }
@@ -253,7 +267,6 @@ Votre choix :");
                 {
                     case 1:
                         AjouterUnProduit();
-                        Sauvegarder();
                         break;
 
                     case 2:
@@ -267,12 +280,10 @@ Votre choix :");
 
                     case 4:
                         ModifierProduit();
-                        Sauvegarder();
                         break;
 
                     case 5:
                         SupprimerProduit();
-                        Sauvegarder();
                         break;
 
                     case 6:
