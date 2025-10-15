@@ -213,9 +213,14 @@ Votre choix :");
         {
             if (!StockProduits.EstAJour(cheminFichier)){
                 Sauvegarder();
+                Console.WriteLine("Fermeture du programme...");
                 Environment.Exit(1);
             }
-            Environment.Exit(1);
+            else
+            {
+                Console.WriteLine("L'inventaire est à jour. Fermeture du programme...");
+                Environment.Exit(0);
+            }
         }
         
         static void AfficherLesChoix()
@@ -240,8 +245,8 @@ Votre choix :");
             StockProduits.ChargerProduits(cheminFichier);
             AfficherLesChoix();
             int choix = GetValidInt();
-            
-            while(choix != 8)
+
+            while (choix != 8)
             {
 
                 switch (choix)
@@ -277,19 +282,17 @@ Votre choix :");
                     case 7:
                         Sauvegarder(false);
                         break;
-
-                    case 8:
-                        Quitter();
-                        break;
                     default:
                         Console.WriteLine("Choix invalide");
                         break;
                 }
-                
+
                 AfficherLesChoix();
                 choix = GetValidInt();
-             
+
             }
+            
+            Quitter();
         }
     }
 }

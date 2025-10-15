@@ -6,3 +6,4 @@ Stylo|ST654|0.99|100|PapeterieChaise
 KIW|A55|99.6|55|-
 orange|O852|8|83|Fruit
 kiwi|55A|55.32|7|  poisson  -
+hgjkl|566h|85|12|lkjhgf
