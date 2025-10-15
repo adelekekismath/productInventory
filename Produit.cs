@@ -33,10 +33,28 @@ namespace ProducInventory
                    $"Catégorie du produit : {Categorie}" +
                    "\n";
         }
-        
+
         public double ValeurStock()
         {
             return Prix * Quantite;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is Produit other)
+            {
+                return Reference == other.Reference &&
+                       Nom == other.Nom &&
+                       Prix == other.Prix &&
+                       Quantite == other.Quantite &&
+                       Categorie == other.Categorie;
+            }
+            return false;
+        }
+        
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Reference, Nom, Prix, Quantite, Categorie);
         }
     }
 }
