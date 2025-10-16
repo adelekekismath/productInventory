@@ -3,7 +3,7 @@ namespace ProducInventory
     class GestionaireProduits( IStockageProduits stockage)
     {
         private List<Produit> _Produits = [];
-        private readonly IStockageProduits _stockage = stockage;
+        private  IStockageProduits _stockage = stockage;
 
         private bool EstVide(bool showMessage = true)
         {
@@ -28,6 +28,11 @@ namespace ProducInventory
             {
                 Console.WriteLine("Impossible d'ajouter ce produit, il existe déjà");
             }
+        }
+
+        public void SetStockage(IStockageProduits stockage)
+        {
+            _stockage = stockage;
         }
 
         public void AfficherTousProduits()
@@ -104,10 +109,10 @@ namespace ProducInventory
 
         public void ChargerProduits(string cheminFichier)
         {
-            _Produits = _stockage.Charger(cheminFichier);
+            _Produits = _stockage.Charger();
             if (!EstVide(false))
             {
-                Console.WriteLine("Les produits ont été chargés avec succès depuis le fichier.");
+                Console.WriteLine("Les produits ont été chargés avec succès.");
             }
 
         }
@@ -115,13 +120,13 @@ namespace ProducInventory
         public void SauvegarderProduits(string cheminFichier)
         {
             if (EstVide()) return;
-            _stockage.Sauvegarder(cheminFichier, _Produits);
+            _stockage.Sauvegarder( _Produits);
         }
     
     
         public bool EstAJour(string cheminFichier)
         {
-            List<Produit> produitsFichier = _stockage.Charger(cheminFichier);
+            List<Produit> produitsFichier = _stockage.Charger();
 
             if (_Produits.Count != produitsFichier.Count) return false;
 

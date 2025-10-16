@@ -1,21 +1,24 @@
 namespace ProducInventory
 {
-    class FichierTexteStockage: IStockageProduits
+    class FichierTexteStockage : IStockageProduits
     {
-        private static bool IsFileExist(string cheminFichier)
+        private readonly string cheminFichier;
+
+        public FichierTexteStockage(string cheminFichier)
         {
-            if (!File.Exists(cheminFichier))
-            {
-                Console.WriteLine("Le fichier spécifié n'existe pas.");
-                return false;
-            }
-            return true;
+            this.cheminFichier = cheminFichier;
         }
-        public List<Produit> Charger(string cheminFichier)
+
+        private bool IsFileExist()
+        {
+            return cheminFichier != null && !File.Exists(cheminFichier);
+        }
+     
+        public List<Produit> Charger()
         {
             List<Produit> produitsCharger = [];
 
-            if (!IsFileExist(cheminFichier)) return produitsCharger;
+            if (!IsFileExist()) return produitsCharger;
 
             try
             {
@@ -54,9 +57,9 @@ namespace ProducInventory
             return produitsCharger;
         }
 
-        public void Sauvegarder(string cheminFichier, List<Produit>? produits = null)
+        public void Sauvegarder(List<Produit>? produits = null)
         {
-            if (IsFileExist(cheminFichier) && produits != null && produits.Count > 0)
+            if (IsFileExist() && produits != null && produits.Count > 0)
             {
                 try
                 {

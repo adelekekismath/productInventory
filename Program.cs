@@ -1,7 +1,9 @@
 ﻿namespace ProducInventory {
     class Program {
-        static readonly GestionaireProduits StockProduits = new(new FichierTexteStockage());
+        static  GestionaireProduits? StockProduits ;
         const string cheminFichier = "inventaire.txt";
+
+        const string connectionString = "Host=localhost;Port=5432;Username=postgres;Password=root;Database=gestionnaire_produit";
 
         static int GetValidInt()
         {
@@ -40,7 +42,7 @@
             string nom = GetValidString();
             Console.WriteLine("Entrez la référence du produit:");
             string reference = GetValidString(true);
-            while (StockProduits.RechercherProduit(reference) != null)
+            while (StockProduits != null && StockProduits.RechercherProduit(reference) != null)
             {
                 Console.WriteLine(" Cette réference existe déjà, veuillez réessayer");
                 reference = GetValidString(true);
@@ -63,7 +65,7 @@
             string categorie = GetValidString();
 
             Produit produit = new(nom, reference, prix, quantite, categorie);
-            StockProduits.AjouterProduit(produit);
+            StockProduits?.AjouterProduit(produit);
             Sauvegarder();
         }
 
@@ -72,12 +74,12 @@
             Console.WriteLine("Entrez la référence du produit que vous voulez modifier:");
             string reference = GetValidString(true);
 
-            Produit? produitExistant = StockProduits.RechercherProduit(reference);
+            Produit? produitExistant = StockProduits?.RechercherProduit(reference);
             while (produitExistant == null)
             {
                 Console.WriteLine("Ce produit n'existe pas, veuillez rentrer une référence valide :");
                 reference = GetValidString(true);
-                produitExistant = StockProduits.RechercherProduit(reference);
+                produitExistant = StockProduits?.RechercherProduit(reference);
             }
 
             string nom = produitExistant.Nom;
@@ -135,7 +137,7 @@
             } while (choixModification != 5);
 
             Produit produitModifie = new Produit(nom, prix, quantite, categorie);
-            StockProduits.ModifierProduit(reference, produitModifie);
+            StockProduits?.ModifierProduit(reference, produitModifie);
 
             Console.WriteLine("Produit modifié avec succès !");
             Sauvegarder();
@@ -159,7 +161,7 @@ Votre choix :");
             Console.WriteLine("Entrez la référence du produit:");
             string reference = GetValidString(true);
 
-            if(StockProduits.RechercherProduit(reference) == null)
+            if(StockProduits?.RechercherProduit(reference) == null)
             {
                 Console.WriteLine("Ce produit n'existe pas.");
                 return;
@@ -182,7 +184,7 @@ Votre choix :");
         
         static void Sauvegarder(bool confirmationNeeded = true)
         {
-            if (StockProduits.EstAJour(cheminFichier))
+            if (StockProduits?.EstAJour(cheminFichier) == true)
             {
                 Console.WriteLine("L'inventaire est déjà à jour. Aucune sauvegarde nécessaire.");
                 return;
@@ -194,13 +196,13 @@ Votre choix :");
 
                 if (int.TryParse(Console.ReadLine(), out int confirmationChoice) && confirmationChoice == 1)
                 {
-                    StockProduits.SauvegarderProduits(cheminFichier);
+                    StockProduits?.SauvegarderProduits(cheminFichier);
                 }
             }
             else
             {
-                StockProduits.SauvegarderProduits(cheminFichier);
-                
+                StockProduits?.SauvegarderProduits(cheminFichier);
+
             }
             
         }
@@ -209,7 +211,7 @@ Votre choix :");
         {
             Console.WriteLine("Entrez la référence de votre produit: ");
             string reference = GetValidString(true);
-            var produit = StockProduits.RechercherProduit(reference);
+            var produit = StockProduits?.RechercherProduit(reference);
 
             if (produit != null)
             {
@@ -225,7 +227,8 @@ Votre choix :");
         
         static void Quitter()
         {
-            if (!StockProduits.EstAJour(cheminFichier)){
+            if (!StockProduits?.EstAJour(cheminFichier) == true)
+            {
                 Sauvegarder();
                 Console.WriteLine("Fermeture du programme...");
                 Environment.Exit(1);
@@ -251,12 +254,38 @@ Votre choix :");
 8. Quitter
 Votre choix :");
         }
+        public static void ChoisirLeStockage()
+        {
+            Console.WriteLine("Voulez-vous utiliser une base de données PostgreSQL ou un fichier texte pour stocker les produits ?");
+            Console.WriteLine("Entrez 1 pour PostgreSQL ou 2 pour fichier texte :");
+            int choixStockage = GetValidInt();
+            while (choixStockage != 1 && choixStockage != 2)
+            {
+                Console.WriteLine("Choix invalide. Veuillez entrer 1 pour PostgreSQL ou 2 pour fichier texte :");
+                choixStockage = GetValidInt();
+            }
 
+            if (choixStockage == 1)
+            {
+                StockProduits = new GestionaireProduits(new PostgresStockage(connectionString));
+                Console.WriteLine("Vous avez choisi PostgreSQL pour le stockage des produits.");
+            }
+            else
+            {
+                StockProduits = new GestionaireProduits(new FichierTexteStockage(cheminFichier));
+                Console.WriteLine("Vous avez choisi un fichier texte pour le stockage des produits.");
+            }
+        }
 
 
         static void Main(string[] args) {
+            
+            Console.WriteLine("Bienvenue dans le gestionnaire d'inventaire !");
+
+            ChoisirLeStockage();
+
             Console.WriteLine("\nChargement de l'inventaire...\n");
-            StockProduits.ChargerProduits(cheminFichier);
+            StockProduits?.ChargerProduits(cheminFichier);
             AfficherLesChoix();
             int choix = GetValidInt();
 
@@ -271,7 +300,7 @@ Votre choix :");
 
                     case 2:
                         Console.WriteLine("\nVoici la liste des produits:\n");
-                        StockProduits.AfficherTousProduits();
+                        StockProduits?.AfficherTousProduits();
                         break;
 
                     case 3:
@@ -287,7 +316,7 @@ Votre choix :");
                         break;
 
                     case 6:
-                        StockProduits.AfficherStatistiques();
+                        StockProduits?.AfficherStatistiques();
                         break;
 
                     case 7:

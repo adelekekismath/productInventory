@@ -2,7 +2,7 @@ namespace ProducInventory
 {
     interface IStockageProduits
     {
-        List<Produit> Charger(string cheminFichier);
-        void Sauvegarder(string cheminFichier, List<Produit>? produits = null);
+        List<Produit> Charger();
+        void Sauvegarder( List<Produit>? produits = null);
     }
 }
